@@ -1,16 +1,21 @@
 # ZSH theme
 
-local user_host='%{$fg[yellow]%}[%n@%m]%{$reset_color%}'
-local current_dir='%{$fg[yellow]%}[${PWD/#$HOME/~}]%{$reset_color%}'
-local date_time='%{$fg[blue]%}[%D{%Y-%m-%d %T}]%{$reset_color%}'
+local user_host='%{$fg[cyan]%}%n@%m%{$reset_color%}'
+local current_dir='%{$fg[yellow]%}${PWD/#$HOME/~}%{$reset_color%}'
+# local date_time='%{$fg[blue]%}%D{%Y-%m-%d %T}%{$reset_color%}'
+local date_time='%{$fg[cyan]%}%D{%T}%{$reset_color%}'
 local git_branch='$(git_prompt_info) $(git_prompt_status)%{$reset_color%}'
-local hist_num='%{$fg_bold[black]%}(%h)%{$reset_color%}'
-local prompt_char='%{$fg_bold[black]%}>%{$reset_color%}'
+local ruby_ver='%{$fg[red]%}r$(rbenv version-name)%{$reset_color%}'
+local perl_ver='%{$fg[blue]%}$(perlbrew use | sed 's/^.*perl-/p/')%{$reset_color%}'
+
+# local hist_num='%{$fg_bold[black]%}(%h)%{$reset_color%}'
+# local prompt_char='%{$fg_bold[black]%}$%{$reset_color%}'
+local prompt_char='$'
 local return_code='%(?..%{$fg[red]%}%? ↵%{$reset_color%})'
 
 PROMPT="
-${user_host} ${date_time} ${current_dir} ${git_branch}
-${hist_num} ${prompt_char} "
+${user_host} ${ruby_ver} ${perl_ver} ${current_dir} ${git_branch}
+${date_time} ${prompt_char} "
 RPS1="${return_code}"
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[green]%}["
