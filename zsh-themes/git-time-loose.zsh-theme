@@ -11,11 +11,11 @@ local perl_ver='%{$fg[blue]%}$(perlbrew use | sed ''s/^.*perl-/p/'')%{$reset_col
 # local hist_num='%{$fg_bold[black]%}(%h)%{$reset_color%}'
 # local prompt_char='%{$fg_bold[black]%}$%{$reset_color%}'
 local prompt_char='$'
-local return_code='%(?..%{$fg[red]%}%? ↵%{$reset_color%})'
+local return_code='%(?..%{$fg[red]%}%? <<%{$reset_color%})'
 
 PROMPT="
-${user_host} ${perl_ver} ${ruby_ver} ${current_dir} ${git_branch}
-${date_time} ${prompt_char} "
+${user_host} ${date_time} ${perl_ver} ${ruby_ver} ${current_dir} ${git_branch}
+${prompt_char} "
 RPS1="${return_code}"
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[green]%}["
