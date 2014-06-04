@@ -1,7 +1,7 @@
 # ZSH theme
 
 local user_host='%{$fg[green]%}%n@%m%{$reset_color%}'
-local current_dir='%{$fg[yellow]%}${PWD/#$HOME/~}%{$reset_color%}'
+local current_dir='%{$fg[green]%}${PWD/#$HOME/~}%{$reset_color%}'
 # local date_time='%{$fg[blue]%}%D{%Y-%m-%d %T}%{$reset_color%}'
 local date_time='%{$fg[green]%}%D{%T}%{$reset_color%}'
 local git_branch='$(git_prompt_info) $(git_prompt_status)%{$reset_color%}'
