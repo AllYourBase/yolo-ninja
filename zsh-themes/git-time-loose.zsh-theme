@@ -6,7 +6,7 @@ local current_dir='%{$fg[green]%}${PWD/#$HOME/~}%{$reset_color%}'
 local date_time='%{$fg[green]%}%D{%T}%{$reset_color%}'
 local git_branch='$(git_prompt_info) $(git_prompt_status)%{$reset_color%}'
 local ruby_ver='%{$fg[red]%}r$(rbenv version-name)%{$reset_color%}'
-local perl_ver='%{$fg[blue]%}$(perlbrew use | perl -pe "s{^.*perl-}{p}xms; s{Currently[ ]using[ ]}{}xms;")%{$reset_color%}'
+local perl_ver='%{$fg[blue]%}'"$(perl -v | perl -nle 's{^.*v(\d+[.]\d+[.]\d+).*}{p$1}xmsg && print;')"'%{$reset_color%}'
 
 # local hist_num='%{$fg_bold[black]%}(%h)%{$reset_color%}'
 # local prompt_char='%{$fg_bold[black]%}$%{$reset_color%}'
