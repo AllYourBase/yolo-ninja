@@ -1,46 +1,56 @@
 #!/usr/bin/env python
 # coding=UTF-8
 
-import math, subprocess
+import math, subprocess, re, sys
 
-p = subprocess.Popen(["ioreg", "-rc", "AppleSmartBattery"], stdout=subprocess.PIPE)
+p = subprocess.Popen(['pmset', '-g', 'batt'], stdout=subprocess.PIPE)
 output = p.communicate()[0]
 
-o_max = [l for l in output.splitlines() if 'MaxCapacity' in l][0]
-o_cur = [l for l in output.splitlines() if 'CurrentCapacity' in l][0]
+# sample output
+# "Now drawing from 'AC Power'\n -InternalBattery-0 (id=4522083)\t47%; charging; 2:00 remaining present: true\n"
+# "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=4522083)\t67%; charging; (no estimate) remaining present: true\n"
 
-b_max = float(o_max.rpartition('=')[-1].strip())
-b_cur = float(o_cur.rpartition('=')[-1].strip())
+source, data = output.splitlines()
 
-charge = b_cur / b_max
-charge_threshold = int(math.ceil(10 * charge))
+source = re.sub('^Now\ drawing\ from\ |\x27', '', source)
+pct, state, time = [x.strip() for x in data.split("\t")[-1].split(';')]
 
-# Output
+time = re.search('\d+[:]\d{2}', time)
+time = '-:--' if (not time or time.group() == '0:00') else time.group()
 
-total_slots, slots = 10, []
-# filled = int(math.ceil(charge_threshold * (total_slots / 10.0))) * u'▸'
-# '\u2588' = full block - uses entire letterform block
-# '\u26a1' = lightning bolt - thin stroke, difficult to make out
-# '\u220e' = smaller block - discontiguous, slightly low of center
-# '\u25a0' = other block - contiguous, not as tall as full block, sits low of center
-# '\u25cf' = large solid circle
-# u'\U0001f50b' = battery icon
-filled = int(math.ceil(charge_threshold * (total_slots / 10.0))) * u'\u25a0'
-# empty = (total_slots - len(filled)) * u'▹'
-empty = (total_slots - len(filled)) * ' '
+charge_pct = int(re.sub('[%]', '', pct))
+charge_ratio = charge_pct / 100.0
 
-out = (filled + empty).encode('utf-8')
-import sys
+# modify this for a longer/shorter charge graph
+graph_blocks = 10
+
+# Unicode sequences for possible graphical characters
+# '\u26a1' = lightning bolt - thin stroke, difficult to see
+# '\u25a0' = medium block - contiguous
+#  u'\U0001f50b' = battery icon
+# '\u2622' - radioactive symbol
+
+filled_blocks = int(round((charge_ratio * graph_blocks), 0)) * u'\u25a0'
+empty_blocks = int(graph_blocks - len(filled_blocks)) * u'\u25a0'
 
 color_green = '%{$fg[green]%}'
 color_yellow = '%{$fg[yellow]%}'
 color_red = '%{$fg[red]%}'
+color_black = '%{$fg[black]%}'
 color_reset = '%{$reset_color%}'
-color_out = (
-    color_green if len(filled) > 6
-    else color_yellow if len(filled) > 4
+color_empty = color_black
+color_filled = (
+    color_green if len(filled_blocks) > 0.6 * graph_blocks
+    else color_yellow if len(filled_blocks) > 0.2 * graph_blocks
     else color_red
 )
 
-out = ('[').encode('utf-8') + color_out + out + color_reset + (']').encode('utf-8')
-sys.stdout.write(out)
+pct_string = str(charge_pct) + '%%'
+chg_status = {
+	'AC Power': color_green + '/'.join(['+', pct_string, time]),
+	'Battery Power': color_filled  + '/'.join(['-', pct_string, time])
+}
+battery_bar = (color_filled + filled_blocks + color_empty + empty_blocks)
+battery_status = (chg_status[source] + ' ' + battery_bar + color_reset).encode('utf-8')
+
+sys.stdout.write(battery_status)
