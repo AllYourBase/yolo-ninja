@@ -10,7 +10,8 @@ output = p.communicate()[0]
 # "Now drawing from 'AC Power'\n -InternalBattery-0 (id=4522083)\t47%; charging; 2:00 remaining present: true\n"
 # "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=4522083)\t67%; charging; (no estimate) remaining present: true\n"
 
-source, data = output.splitlines()
+lines = output.splitlines()
+source, data = lines[0], lines[1]
 
 source = re.sub('^Now\ drawing\ from\ |\x27', '', source)
 pct, state, time = [x.strip() for x in data.split("\t")[-1].split(';')]
@@ -36,12 +37,14 @@ empty_blocks = int(graph_blocks - len(filled_blocks)) * u'\u25a0'
 color_green = '%{$fg[green]%}'
 color_yellow = '%{$fg[yellow]%}'
 color_red = '%{$fg[red]%}'
+color_blink_red = '\e[5;31m'
 color_black = '%{$fg[black]%}'
 color_reset = '%{$reset_color%}'
 color_empty = color_black
 color_filled = (
-    color_green if len(filled_blocks) > 0.6 * graph_blocks
-    else color_yellow if len(filled_blocks) > 0.2 * graph_blocks
+    color_green if charge_pct > 60
+    else color_yellow if charge_pct > 20
+    else color_blink_red if charge_pct < 10 and source == 'Battery Power'
     else color_red
 )
 
@@ -50,7 +53,7 @@ chg_status = {
 	'AC Power': color_green + '/'.join(['+', pct_string, time]),
 	'Battery Power': color_filled  + '/'.join(['-', pct_string, time])
 }
-battery_bar = (color_filled + filled_blocks + color_empty + empty_blocks)
+battery_bar = (color_filled + filled_blocks + color_reset + color_empty + empty_blocks)
 battery_status = (chg_status[source] + ' ' + battery_bar + color_reset).encode('utf-8')
 
 sys.stdout.write(battery_status)
