@@ -42,8 +42,8 @@ color_black = '%{$fg[black]%}'
 color_reset = '%{$reset_color%}'
 color_empty = color_black
 color_filled = (
-    color_green if charge_pct > 60
-    else color_yellow if charge_pct > 20
+    color_green if charge_pct > 49
+    else color_yellow if charge_pct > 19
     else color_blink_red if charge_pct < 10 and source == 'Battery Power'
     else color_red
 )
