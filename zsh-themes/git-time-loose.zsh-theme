@@ -1,7 +1,9 @@
 # ZSH theme
 
 local user_host='%{$fg[cyan]%}%n@%m%{$reset_color%}'
-local current_dir='%{$fg[cyan]%}${PWD/#$HOME/~}%{$reset_color%}'
+# local current_dir='%{$fg[cyan]%}${PWD/#$HOME/~}%{$reset_color%}'
+# Swap `~` for $HOME and only show last two components of path
+local current_dir='%{$fg[cyan]%}%2~%{$reset_color%}'
 # local date_time='%{$fg[blue]%}%D{%Y-%m-%d %T}%{$reset_color%}'
 local date_time='%{$fg[cyan]%}%D{%T}%{$reset_color%}'
 local git_branch='$(git_prompt_info) $(git_prompt_status)%{$reset_color%}'
