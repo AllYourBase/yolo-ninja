@@ -3,15 +3,11 @@
 
 import math, subprocess, re, sys
 
-p = subprocess.Popen(['pmset', '-g', 'batt'], stdout=subprocess.PIPE)
-output = p.communicate()[0]
+source, data = subprocess.check_output('pmset -g batt', shell=True, encoding='utf8').splitlines()
 
-# sample output
+# sample output of 'pmset -g batt'
 # "Now drawing from 'AC Power'\n -InternalBattery-0 (id=4522083)\t47%; charging; 2:00 remaining present: true\n"
 # "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=4522083)\t67%; charging; (no estimate) remaining present: true\n"
-
-lines = output.splitlines()
-source, data = lines[0], lines[1]
 
 source = re.sub('^Now\ drawing\ from\ |\x27', '', source)
 pct, state, time = [x.strip() for x in data.split("\t")[-1].split(';')]
@@ -54,6 +50,6 @@ chg_status = {
 	'Battery Power': color_filled  + '/'.join(['-', pct_string, time])
 }
 battery_bar = (color_filled + filled_blocks + color_reset + color_empty + empty_blocks)
-battery_status = (chg_status[source] + ' ' + battery_bar + color_reset).encode('utf-8')
+battery_status = (chg_status[source] + ' ' + battery_bar + color_reset)
 
 sys.stdout.write(battery_status)
